@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "645843462595",
+    "firebase_url": "https://chatonfire-bf5b4.firebaseio.com",
+    "project_id": "chatonfire-bf5b4",
+    "storage_bucket": "chatonfire-bf5b4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:645843462595:android:6f315d49ee3cbb9a40f576",
+        "android_client_info": {
+          "package_name": "com.zidni.chatonfire"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "645843462595-sh8a34crfg67j60f24t6iam2lojarcgq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zidni.chatonfire",
+            "certificate_hash": "6147ec0f4647e37031cc06cfcc3cb7128f5a30fb"
+          }
+        },
+        {
+          "client_id": "645843462595-iu7dt1vulren3v16di3kagvospubtno9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSCroMlxC0Ks2uHc0olZJiDo4GUHIiAS0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "645843462595-iu7dt1vulren3v16di3kagvospubtno9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
