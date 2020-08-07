@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Adapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,13 +31,18 @@ public class ChatActivity extends AppCompatActivity {
     private TextView userEm;
     private static final String TAG = "ChatActivity";
     private String userid;
+    private FirebaseUser firebaseUser;
+    private Button sendin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+//        FirebaseUser firebaseUser = myAuth.getCurrentUser();
+//        String userid = firebaseUser.getUid();
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        userid = firebaseUser.getUid();
         final TextView myTextBox = findViewById(R.id.textbox);
-
         myAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -70,15 +76,19 @@ public class ChatActivity extends AppCompatActivity {
 //
 //            }
 //        });
-        FirebaseUser firebaseUser = myAuth.getCurrentUser();
-        String userid = firebaseUser.getUid();
+
 
         myDataRef = FirebaseDatabase.getInstance().getReference("MyUsers");
         myDataRef.addValueEventListener(new ValueEventListener() {
+//            FirebaseUser firebaseUser = myAuth.getCurrentUser();
+//            String userid = firebaseUser.getUid();
+
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 //                String username = dataSnapshot.child("username").getValue().toString();
-                myTextBox.setText("<  "+dataSnapshot.child("msglist").child("email").getValue().toString()+" >  "+dataSnapshot.child("msglist").child("msg").getValue().toString());
+                String username = dataSnapshot.child(userid).child("username").getValue().toString();
+                setTitle(  username+"'s Chat Room");
+                myTextBox.setText("<  " + dataSnapshot.child("msglist").child("email").getValue().toString() + " >  " + dataSnapshot.child("msglist").child("msg").getValue().toString());
 
             }
 
@@ -87,7 +97,29 @@ public class ChatActivity extends AppCompatActivity {
                 myTextBox.setText("Text Canceled");
             }
         });
-
+//        sendin = findViewById(R.id.sendButton);
+//        sendin.setOnClickListener(new View.OnClickListener() {
+//            DatabaseReference myRef3 = FirebaseDatabase.getInstance().getReference("MyUsers");
+//            EditText sendEt = findViewById(R.id.editText);
+//
+//            @Override
+//            public void onClick(View view) {
+//                EditText mysendEdit = (EditText) findViewById(R.id.editText);
+//                myRef3.child("msglist").child("msg").setValue(mysendEdit.getText().toString());
+//                myRef3.addValueEventListener(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError error) {
+//
+//                    }
+//                });
+//
+//            }
+//        });
     }
 
     public void sendmessage(View view) {
@@ -123,11 +155,13 @@ public class ChatActivity extends AppCompatActivity {
     private void toastMessage(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
+
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
         return true;
     }
+
     public boolean onOptionsItemSelected(MenuItem item) {
 //respond to menu item selection
         switch (item.getItemId()) {

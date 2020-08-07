@@ -80,7 +80,7 @@ public class RegisterActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
-                                        startActivity(new Intent(RegisterActivity.this, ChatActivity.class)
+                                        startActivity(new Intent(RegisterActivity.this, MainActivity.class)
                                                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
                                         finish();
                                     }
