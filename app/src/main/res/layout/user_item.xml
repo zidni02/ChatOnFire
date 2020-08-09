@@ -3,44 +3,44 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/relativeLayout"
     android:layout_width="match_parent"
-    android:layout_height="?android:attr/listPreferredItemHeightLarge"
-    >
+    android:layout_height="?android:attr/listPreferredItemHeightLarge">
 
-<ImageView
+    <ImageView
 
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_centerVertical="true"
-    android:layout_alignParentStart="true"
-    android:id="@+id/userimageadapter"
-    tools:srcCompat="@mipmap/ic_launcher"
-    android:layout_alignParentLeft="true"
-    android:layout_marginStart="@dimen/activity_horizontal_margin"
-    android:layout_marginEnd="@dimen/activity_horizontal_margin"
-    android:contentDescription="Icon" />
-<LinearLayout
-    android:layout_width="wrap_content"
-    android:layout_height="match_parent"
-    android:layout_toEndOf="@id/userimageadapter"
-    android:layout_toRightOf="@id/userimageadapter"
-    android:orientation="vertical"
-    android:gravity="center_vertical">
-<TextView
-    android:id="@+id/userlistadapter"
-    android:layout_width="wrap_content"
-    android:text="Name"
-    android:textAlignment="center"
-    android:layout_height="wrap_content"
-    android:textSize="16sp"
-     />
-    <TextView
-        android:id="@+id/userlistadapterEmail"
+        android:id="@+id/userimageadapter"
         android:layout_width="wrap_content"
-        android:text="Email"
-        android:textAlignment="center"
         android:layout_height="wrap_content"
-        android:textSize="10sp"
-        />
-</LinearLayout>
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:contentDescription="Icon"
+        tools:srcCompat="@mipmap/ic_launcher" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_toEndOf="@id/userimageadapter"
+        android:layout_toRightOf="@id/userimageadapter"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/userlistadapter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Name"
+            android:textAlignment="center"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/userlistadapterEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Email"
+            android:textAlignment="center"
+            android:textSize="10sp" />
+    </LinearLayout>
 
 </RelativeLayout>
