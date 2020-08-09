@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.widget.TableLayout;
 import android.widget.Toast;
 
+import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -24,6 +25,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.zidni.chatonfire.Fragment.ChatFragment;
+import com.zidni.chatonfire.Fragment.UsersFragment;
 import com.zidni.chatonfire.model.Users;
 
 import java.util.ArrayList;
@@ -52,9 +55,16 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        TableLayout tableLayout = findViewById(R.id.tabLayout);
+        TabLayout tabLayout = findViewById(R.id.tabLayout);
         ViewPager viewPager = findViewById(R.id.viewPager);
-ViewPagerAdapter viewPagerAdapter=new ViewPagerAdapter(getSupportFragmentManager());
+        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+
+        viewPagerAdapter.addFragment(new ChatFragment(), "Chat List");
+        viewPagerAdapter.addFragment(new UsersFragment(), "User List");
+        viewPager.setAdapter(viewPagerAdapter);
+        tabLayout.setupWithViewPager(viewPager);
+
+
     }
 
     private void toastMessage(String message) {
