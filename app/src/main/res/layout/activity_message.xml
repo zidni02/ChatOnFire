@@ -44,7 +44,7 @@
         android:id="@+id/reyclerview_message_list"
         android:layout_weight="1"
         android:divider="#fff"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         />
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"

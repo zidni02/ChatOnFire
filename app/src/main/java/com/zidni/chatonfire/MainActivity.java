@@ -26,6 +26,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.zidni.chatonfire.Fragment.ChatFragment;
+import com.zidni.chatonfire.Fragment.ProfileFragment;
 import com.zidni.chatonfire.Fragment.UsersFragment;
 import com.zidni.chatonfire.model.Users;
 
@@ -61,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
         viewPagerAdapter.addFragment(new ChatFragment(), "Chat List");
         viewPagerAdapter.addFragment(new UsersFragment(), "User List");
+        viewPagerAdapter.addFragment(new ProfileFragment(), "My Profile");
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 

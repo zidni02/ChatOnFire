@@ -4,6 +4,7 @@ public class Chat {
     private String sender;
     private String receiver;
     private String message;
+    private String receivername;
 
     public String getSender() {
         return sender;
@@ -29,10 +30,19 @@ public class Chat {
         this.message = message;
     }
 
-    public Chat(String sender, String receiver, String message) {
+    public String getReceivername() {
+        return receivername;
+    }
+
+    public void setReceivername(String receivername) {
+        this.receivername = receivername;
+    }
+
+    public Chat(String sender, String receiver, String message, String receivername) {
         this.sender = sender;
         this.receiver = receiver;
         this.message = message;
+        this.receivername = receivername;
     }
 
     public Chat() {

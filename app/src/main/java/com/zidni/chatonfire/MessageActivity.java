@@ -1,19 +1,18 @@
 package com.zidni.chatonfire;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
-import android.gesture.GestureLibraries;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -22,22 +21,28 @@ import android.widget.Toast;
 import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.zidni.chatonfire.Fragment.ChatFragment;
 import com.zidni.chatonfire.adapter.MessageAdapter;
 import com.zidni.chatonfire.model.Chat;
 import com.zidni.chatonfire.model.Users;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
 public class MessageActivity extends AppCompatActivity {
+    //declare var;
     ImageView imageView;
     TextView username;
     FirebaseUser fireUser;
@@ -48,32 +53,33 @@ public class MessageActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     MessageAdapter messageAdapter;
     List<Chat> mChat;
+    String userid, usernamerecever;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message);
+        //full screen window
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getSupportActionBar().hide();
 
+        //initate var;
         imageView = findViewById(R.id.imageProfile);
         username = findViewById(R.id.usernameyMsg);
         editTextMsgSend = findViewById(R.id.edittext_chatbox_send);
         send_btn = findViewById(R.id.button_chatbox_send);
         recyclerView = findViewById(R.id.reyclerview_message_list);
+//        recyclerView.scrollToPosition( - 1);
         recyclerView.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager=new LinearLayoutManager(getApplicationContext());
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         linearLayoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(linearLayoutManager);
 
-
-
-
-
         intent = getIntent();
-        final String userid = intent.getStringExtra("userid");
-        final String usernamerecever = intent.getStringExtra("username");
+        userid = intent.getStringExtra("userid");
+        usernamerecever = intent.getStringExtra("username");
 
 
         fireUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -88,7 +94,7 @@ public class MessageActivity extends AppCompatActivity {
                 } else {
                     Glide.with(MessageActivity.this).load(users.getImageURL()).into(imageView);
                 }
-             readmsg(fireUser.getUid(), userid, users.getImageURL());
+                readmsg(fireUser.getUid(), userid, users.getImageURL());
             }
 
             @Override
@@ -108,32 +114,91 @@ public class MessageActivity extends AppCompatActivity {
             }
         });
     }
+
     private void sendmessage(String sender, String receiver, String message, String usernamerecever) {
         reference = FirebaseDatabase.getInstance().getReference();
+        /*Pushing new data for msges*/
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("sender", sender);
         hashMap.put("receiver", receiver);
-        hashMap.put("receiverName", usernamerecever);
+        hashMap.put("receivername", usernamerecever);
         hashMap.put("message", message);
         reference.child("ChatList").push().setValue(hashMap);
+        /*For Recent Chats initials*/
+        final DatabaseReference charRef2 = FirebaseDatabase.getInstance().getReference("ChatRecent").child(fireUser.getUid()).child(userid);
+        charRef2.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    charRef2.child("id").setValue(userid);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        notifmsg(fireUser.getUid(), userid);
     }
-    private void readmsg(final String myid, final String userid, final String imagURL){
-        mChat=new ArrayList<>();
-        reference=FirebaseDatabase.getInstance().getReference("ChatList");
+
+    private void notifmsg(String sender, String reciver) {
+        reference = FirebaseDatabase.getInstance().getReference("ChatList");
+//        Chat chat=new Chat();
+        FirebaseUser currentuser=FirebaseAuth.getInstance().getCurrentUser();
+        if (!reciver.equals(userid)) {
+            toastMessage("msg came");
+        }
+        if (reciver.equals(userid)){
+            toastMessage("msg gone");
+        }
+//        reference.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                    Chat chat = snapshot.getValue(Chat.class);
+//                    if (!chat.getSender().equals(userid)) {
+//                        toastMessage("hekko");
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
+    }
+
+
+    private void readmsg(final String myid, final String userid, final String imagURL) {
+        mChat = new ArrayList<>();
+        reference = FirebaseDatabase.getInstance().getReference("ChatList");
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 mChat.clear();
-                for (DataSnapshot snapshot:dataSnapshot.getChildren()){
-                    Chat chat=snapshot.getValue(Chat.class);
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Chat chat = snapshot.getValue(Chat.class);
                     if (chat.getReceiver().equals(myid) && chat.getSender().equals(userid)
-                    || chat.getReceiver().equals(userid)&&chat.getSender().equals(myid)){
+                            || chat.getReceiver().equals(userid) && chat.getSender().equals(myid)) {
                         mChat.add(chat);
                     }
-                    messageAdapter =new MessageAdapter(MessageActivity.this, mChat,
+                    messageAdapter = new MessageAdapter(MessageActivity.this, mChat,
                             imagURL);
+//                    Collections.reverse(mChat);
+//                    messageAdapter.notifyDataSetChanged();
+
+//                    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MessageActivity.this);
+//                    linearLayoutManager.setReverseLayout(true);
+//                    linearLayoutManager.setStackFromEnd(true);
+//                    recyclerView.setLayoutManager(linearLayoutManager);
+//                    messageAdapter.notifyDataSetChanged();
+                    recyclerView.scrollToPosition(mChat.size() - 1);
+//                    recyclerView.smoothScrollToPosition(recyclerView.getItemCount() - 1);
                     recyclerView.setAdapter(messageAdapter);
                 }
+
             }
 
             @Override

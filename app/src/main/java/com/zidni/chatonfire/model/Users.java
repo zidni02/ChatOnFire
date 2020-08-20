@@ -38,16 +38,17 @@ public class Users {
         this.email = email;
     }
 
-    public Users(String id, String username, String imageURL, String email) {
+
+
+
+    public Users(String id, String username, String imageURL, String email, String receiverName) {
         this.id = id;
         this.username = username;
         this.imageURL = imageURL;
         this.email = email;
+
     }
 
     public Users() {
     }
-
-
 }
-

@@ -5,10 +5,14 @@
     android:padding="8dp">
 <RelativeLayout
     android:layout_width="300dp"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:layout_alignParentEnd="true"
     android:layout_alignParentRight="true">
-
+<TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_above="@id/show_msg"
+    android:text="ME"/>
     <ImageView
         android:id="@+id/profile_pic_conversation"
         android:layout_width="40dp"

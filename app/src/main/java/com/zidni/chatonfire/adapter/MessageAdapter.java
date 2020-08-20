@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.zidni.chatonfire.MessageActivity;
 import com.zidni.chatonfire.R;
@@ -25,6 +26,7 @@ import java.util.List;
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
     private Context context;
     private List<Chat> mChat;
+    private List<Chat> receive;
     private String imageURL;
     public static final int MSG_TYPE_LEFT = 0;
     public static final int MSG_TYPE_RIGHT = 1;
@@ -54,6 +56,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Chat chat = mChat.get(position);
+//        holder.show_msg.setText(chat.getReceivername());
         holder.show_msg.setText(chat.getMessage());
         if (imageURL.equals("default")){
             holder.profile_img.setImageResource(R.mipmap.ic_launcher);
@@ -74,6 +77,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView show_msg;
         public ImageView profile_img;
+        public TextView userreceiver;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -24,6 +25,7 @@ public class LoginActivity extends AppCompatActivity {
     Button loginBtn, signupBtn;
     private static final String TAG = "LoginActivity";
     FirebaseAuth myAuth;
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +35,7 @@ public class LoginActivity extends AppCompatActivity {
         passLogin = findViewById(R.id.passEditTex);
         loginBtn = findViewById(R.id.login_btn);
         signupBtn = findViewById(R.id.signUpAct);
+        progressBar = findViewById(R.id.progressBar);
         signupBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -61,6 +64,7 @@ public class LoginActivity extends AppCompatActivity {
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 String email_tex = emaillogin.getText().toString();
                 String passTex = passLogin.getText().toString();
                 if (TextUtils.isEmpty(email_tex) || TextUtils.isEmpty(passTex)) {
@@ -70,13 +74,16 @@ public class LoginActivity extends AppCompatActivity {
                     myAuth.signInWithEmailAndPassword(email_tex, passTex).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
+                            progressBar.setVisibility(View.VISIBLE);
                             if (task.isSuccessful()) {
                                 startActivity(new Intent(LoginActivity.this, MainActivity.class)
                                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+                                progressBar.setVisibility(View.GONE);
                                 finish();
                             } else {
                                 Toast.makeText(LoginActivity.this, "Inavlid!",
                                         Toast.LENGTH_LONG).show();
+                                progressBar.setVisibility(View.GONE);
                             }
                         }
 
@@ -92,6 +99,8 @@ public class LoginActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         myAuth.addAuthStateListener(mAuthListener);
+        progressBar.setVisibility(View.VISIBLE);
+
     }
 
     @Override
@@ -101,7 +110,8 @@ public class LoginActivity extends AppCompatActivity {
             myAuth.removeAuthStateListener(mAuthListener);
         }
     }
-    private void toastMessage(String message){
-        Toast.makeText(this,message,Toast.LENGTH_SHORT).show();
+
+    private void toastMessage(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }
