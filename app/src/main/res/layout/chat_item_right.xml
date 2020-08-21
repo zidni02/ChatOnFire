@@ -8,22 +8,25 @@
     android:layout_height="match_parent"
     android:layout_alignParentEnd="true"
     android:layout_alignParentRight="true">
-<TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_above="@id/show_msg"
-    android:text="ME"/>
     <ImageView
         android:id="@+id/profile_pic_conversation"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:visibility="gone"
         android:src="@mipmap/ic_launcher" />
-
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:orientation="vertical"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="5dp"
+    android:layout_alignParentEnd="true"
+    android:layout_alignParentRight="true"
+    android:layout_toRightOf="@id/profile_pic_conversation"
+    android:padding="10dp"
+    >
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="5dp"
         android:textSize="18sp"
         android:id="@+id/show_msg"
         android:layout_alignParentEnd="true"
@@ -31,6 +34,17 @@
         android:layout_toRightOf="@id/profile_pic_conversation"
         android:background="@drawable/bg_right"
         android:padding="10dp"
+        android:textColor="@color/bg_left"
         android:text="hello" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="status"
+        android:visibility="gone"
+        android:id="@+id/msg_status_seen_unseen"
+        android:layout_gravity="center_horizontal"
+        android:textSize="10sp"
+        />
+</LinearLayout>
 </RelativeLayout>
 </RelativeLayout>

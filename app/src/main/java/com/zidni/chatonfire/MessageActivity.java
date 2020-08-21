@@ -38,13 +38,14 @@ import com.zidni.chatonfire.model.Users;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.FormatFlagsConversionMismatchException;
 import java.util.HashMap;
 import java.util.List;
 
 public class MessageActivity extends AppCompatActivity {
     //declare var;
-    ImageView imageView;
-    TextView username;
+    ImageView imageView, statusImg;
+    TextView username, statusOnOff;
     FirebaseUser fireUser;
     DatabaseReference reference;
     Intent intent;
@@ -54,6 +55,7 @@ public class MessageActivity extends AppCompatActivity {
     MessageAdapter messageAdapter;
     List<Chat> mChat;
     String userid, usernamerecever;
+    ValueEventListener seenLitstner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +67,8 @@ public class MessageActivity extends AppCompatActivity {
         getSupportActionBar().hide();
 
         //initate var;
+        statusImg=findViewById(R.id.status_img_activity_msg);
+        statusOnOff=findViewById(R.id.status_activity_msg);
         imageView = findViewById(R.id.imageProfile);
         username = findViewById(R.id.usernameyMsg);
         editTextMsgSend = findViewById(R.id.edittext_chatbox_send);
@@ -89,6 +93,13 @@ public class MessageActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Users users = snapshot.getValue(Users.class);
                 username.setText(users.getUsername());
+                statusOnOff.setText(users.getStatus());
+                if (users.getStatus().equals("Online")){
+                    statusImg.setImageResource(R.drawable.status_online);
+                }
+                if (users.getStatus().equals("Offline")){
+                    statusImg.setImageResource(R.drawable.status_offline);
+                }
                 if (users.getImageURL().equals("default")) {
                     imageView.setImageResource(R.mipmap.ic_launcher);
                 } else {
@@ -113,6 +124,28 @@ public class MessageActivity extends AppCompatActivity {
                 }
             }
         });
+        seenMsgListen(userid);
+    }
+    private void seenMsgListen(final String userid){
+        reference=FirebaseDatabase.getInstance().getReference("ChatList");
+        seenLitstner =reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot:dataSnapshot.getChildren()){
+                    Chat chat=snapshot.getValue(Chat.class);
+                    if (chat.getReceiver().equals(fireUser.getUid()) && chat.getSender().equals(userid)){
+                        HashMap<String, Object>hashMap=new HashMap<>();
+                        hashMap.put("isseen",true);
+                        snapshot.getRef().updateChildren(hashMap);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void sendmessage(String sender, String receiver, String message, String usernamerecever) {
@@ -123,6 +156,7 @@ public class MessageActivity extends AppCompatActivity {
         hashMap.put("receiver", receiver);
         hashMap.put("receivername", usernamerecever);
         hashMap.put("message", message);
+        hashMap.put("isseen", false);
         reference.child("ChatList").push().setValue(hashMap);
         /*For Recent Chats initials*/
         final DatabaseReference charRef2 = FirebaseDatabase.getInstance().getReference("ChatRecent").child(fireUser.getUid()).child(userid);
@@ -139,19 +173,35 @@ public class MessageActivity extends AppCompatActivity {
 
             }
         });
-        notifmsg(fireUser.getUid(), userid);
+//        notifmsg(fireUser.getUid(), userid);
     }
 
-    private void notifmsg(String sender, String reciver) {
+    private void notifmsg(final String sender, final String reciver) {
         reference = FirebaseDatabase.getInstance().getReference("ChatList");
 //        Chat chat=new Chat();
-        FirebaseUser currentuser=FirebaseAuth.getInstance().getCurrentUser();
-        if (!reciver.equals(userid)) {
-            toastMessage("msg came");
-        }
-        if (reciver.equals(userid)){
-            toastMessage("msg gone");
-        }
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot datasnapshot) {
+                FirebaseUser currentuser = FirebaseAuth.getInstance().getCurrentUser();
+                for (DataSnapshot snapshot : datasnapshot.getChildren()) {
+                    Chat chat2 = snapshot.getValue(Chat.class);
+//                    toastMessage(chat2.getReceivername()+currentuser.getEmail());
+                    if (!chat2.getReceiver().equals(currentuser.getUid())) {
+                        toastMessage("heyyyyyyyyyy");
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+//        if (currentuser.equals(fireUser.getUid())){
+//            toastMessage("msg gone");
+//        }
 //        reference.addValueEventListener(new ValueEventListener() {
 //            @Override
 //            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -184,6 +234,7 @@ public class MessageActivity extends AppCompatActivity {
                             || chat.getReceiver().equals(userid) && chat.getSender().equals(myid)) {
                         mChat.add(chat);
                     }
+
                     messageAdapter = new MessageAdapter(MessageActivity.this, mChat,
                             imagURL);
 //                    Collections.reverse(mChat);
@@ -233,4 +284,39 @@ public class MessageActivity extends AppCompatActivity {
         }
 
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkStatus("Online");
+    }
+
+    @Override
+    protected void onUserLeaveHint() {
+        super.onUserLeaveHint();
+        checkStatus("Offline");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        reference.removeEventListener(seenLitstner);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        checkStatus("Online");
+    }
+
+
+    private void checkStatus(String status) {
+        reference = FirebaseDatabase.getInstance()
+                .getReference("MyUsers").child(fireUser.getUid());
+        HashMap<String, Object> hashMap2 = new HashMap<>();
+        hashMap2.put("status", status);
+        reference.updateChildren(hashMap2);
+
+    }
+
+
 }

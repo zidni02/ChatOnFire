@@ -26,7 +26,7 @@ import java.util.List;
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
     private Context context;
     private List<Chat> mChat;
-    private List<Chat> receive;
+    //    private List<Users> mUsers;
     private String imageURL;
     public static final int MSG_TYPE_LEFT = 0;
     public static final int MSG_TYPE_RIGHT = 1;
@@ -35,6 +35,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     public MessageAdapter(Context context, List<Chat> mChat, String imageURL) {
         this.context = context;
         this.mChat = mChat;
+//        this.mUsers = mUsers;
         this.imageURL = imageURL;
     }
 
@@ -56,13 +57,29 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Chat chat = mChat.get(position);
-//        holder.show_msg.setText(chat.getReceivername());
+        fuser = FirebaseAuth.getInstance().getCurrentUser();
+
+//            holder.userreceiver.setVisibility(View.VISIBLE);
+//            holder.userreceiver.setText(chat.getReceivername());
+
         holder.show_msg.setText(chat.getMessage());
-        if (imageURL.equals("default")){
+        if (imageURL.equals("default")) {
             holder.profile_img.setImageResource(R.mipmap.ic_launcher);
+        } else {
+            Glide.with(context).load(imageURL).into(holder.profile_img);
+        }
+        if (position==mChat.size()-1){
+            if (chat.isIsseen()){
+                holder.isseen.setText("Seen");
+                holder.isseen.setVisibility(View.VISIBLE);
+            }
+            else {
+                holder.isseen.setText("Delivered");
+                holder.isseen.setVisibility(View.VISIBLE);
+            }
         }
         else {
-            Glide.with(context).load(imageURL).into(holder.profile_img);
+            holder.isseen.setVisibility(View.GONE);
         }
 
     }
@@ -78,11 +95,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         public TextView show_msg;
         public ImageView profile_img;
         public TextView userreceiver;
+        public TextView isseen;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            show_msg=itemView.findViewById(R.id.show_msg);
-            profile_img=itemView.findViewById(R.id.profile_pic_conversation);
+            show_msg = itemView.findViewById(R.id.show_msg);
+            profile_img = itemView.findViewById(R.id.profile_pic_conversation);
+            userreceiver = itemView.findViewById(R.id.usernamereceiver);
+            isseen=itemView.findViewById(R.id.msg_status_seen_unseen);
 
 
         }

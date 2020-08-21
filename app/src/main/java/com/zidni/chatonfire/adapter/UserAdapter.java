@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,21 +15,25 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.zidni.chatonfire.MessageActivity;
 import com.zidni.chatonfire.R;
 import com.zidni.chatonfire.model.Users;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     private Context context;
     private List<Users> mUsers;
     private List<Users> mEmail;
+    private boolean isChat;
 
-    public UserAdapter(Context context, List<Users> mUsers) {
+    public UserAdapter(Context context, List<Users> mUsers, boolean isChat) {
         this.context = context;
         this.mUsers = mUsers;
+        this.isChat=isChat;
     }
 
     public UserAdapter() {
@@ -52,6 +57,20 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
             Glide.with(context).load(users.getImageURL()).into(holder.imageView);
 
         }
+        if (isChat){
+            if (users.getStatus().equals("Online")){
+                holder.statuslayoutOn.setVisibility(View.VISIBLE);
+                holder.statuslayoutOff.setVisibility(View.GONE);
+            }
+            else {
+                holder.statuslayoutOff.setVisibility(View.VISIBLE);
+                holder.statuslayoutOn.setVisibility(View.GONE);
+            }
+        }
+        else {
+            holder.statuslayoutOff.setVisibility(View.GONE);
+            holder.statuslayoutOn.setVisibility(View.GONE);
+        }
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -59,12 +78,21 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                 i.putExtra("userid", users.getId());
                 i.putExtra("username", users.getUsername());
                 context.startActivity(i);
+                checkStatus("Online");
             }
         });
 
     }
 
+    private void checkStatus(String status) {
+        FirebaseUser firebaseUser=FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference myRef = FirebaseDatabase.getInstance()
+                .getReference("MyUsers").child(firebaseUser.getUid());
+        HashMap<String, Object> hashMap2 = new HashMap<>();
+        hashMap2.put("status", status);
+        myRef.updateChildren(hashMap2);
 
+    }
     @Override
     public int getItemCount() {
 
@@ -75,12 +103,16 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         public TextView username;
         public ImageView imageView;
         public TextView email;
+        public LinearLayout statuslayoutOn;
+        public LinearLayout statuslayoutOff;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             username = itemView.findViewById(R.id.userlistadapter);
             imageView = itemView.findViewById(R.id.userimageadapter);
             email=itemView.findViewById(R.id.userlistadapterEmail);
+            statuslayoutOn=itemView.findViewById(R.id.linLayStatsonn);
+            statuslayoutOff=itemView.findViewById(R.id.linLayStatsOff);
         }
     }
 }

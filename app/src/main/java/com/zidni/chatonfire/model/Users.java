@@ -5,6 +5,7 @@ public class Users {
     private String username;
     private String imageURL;
     private String email;
+    private String status;
 
     public String getId() {
         return id;
@@ -38,17 +39,22 @@ public class Users {
         this.email = email;
     }
 
+    public String getStatus() {
+        return status;
+    }
 
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
+    public Users() {
+    }
 
-    public Users(String id, String username, String imageURL, String email, String receiverName) {
+    public Users(String id, String username, String imageURL, String email, String status) {
         this.id = id;
         this.username = username;
         this.imageURL = imageURL;
         this.email = email;
-
-    }
-
-    public Users() {
+        this.status = status;
     }
 }

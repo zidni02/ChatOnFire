@@ -31,6 +31,7 @@ import com.zidni.chatonfire.Fragment.UsersFragment;
 import com.zidni.chatonfire.model.Users;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
     FirebaseUser firebaseUser;
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         myRef = FirebaseDatabase.getInstance().getReference("MyUsers")
                 .child(firebaseUser.getUid());
@@ -84,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.signout:
                 FirebaseAuth.getInstance().signOut();
-                startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                startActivity(new Intent(MainActivity.this, LoginActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                 finish();
                 return true;
             default:
@@ -126,5 +128,49 @@ public class MainActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             return titles.get(position);
         }
+    }
+
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        checkStatus("Online");
+//    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkStatus("Online");
+    }
+
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        checkStatus("Offline");
+//    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    private void checkStatus(String status) {
+        myRef = FirebaseDatabase.getInstance()
+                .getReference("MyUsers").child(firebaseUser.getUid());
+        HashMap<String, Object> hashMap2 = new HashMap<>();
+        hashMap2.put("status", status);
+        myRef.updateChildren(hashMap2);
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        checkStatus("Offline");
+    }
+
+    @Override
+    protected void onUserLeaveHint() {
+        super.onUserLeaveHint();
+        checkStatus("Offline");
     }
 }

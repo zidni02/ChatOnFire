@@ -38,13 +38,24 @@ public class Chat {
         this.receivername = receivername;
     }
 
-    public Chat(String sender, String receiver, String message, String receivername) {
-        this.sender = sender;
-        this.receiver = receiver;
-        this.message = message;
-        this.receivername = receivername;
+    public boolean isIsseen() {
+        return isseen;
+    }
+
+    public void setIsseen(boolean isseen) {
+        this.isseen = isseen;
     }
 
     public Chat() {
     }
+
+    public Chat(String sender, String receiver, String message, String receivername, boolean isseen) {
+        this.sender = sender;
+        this.receiver = receiver;
+        this.message = message;
+        this.receivername = receivername;
+        this.isseen = isseen;
+    }
+
+    private boolean isseen;
 }

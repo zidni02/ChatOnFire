@@ -75,6 +75,7 @@ public class RegisterActivity extends AppCompatActivity {
                             hashMap.put("id", userid);
                             hashMap.put("username", username);
                             hashMap.put("email", email);
+                            hashMap.put("status", "Offline");
                             hashMap.put("password", pass);
                             hashMap.put("imageURL", "default");
                             hashMap.put("msg", "1");

@@ -3,27 +3,97 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/relativeLayout"
     android:layout_width="match_parent"
+    android:layout_marginTop="20dp"
     android:layout_height="?android:attr/listPreferredItemHeightLarge">
 
-    <ImageView
+    <LinearLayout
 
-        android:id="@+id/userimageadapter"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:scaleType="fitCenter"
+        android:id="@+id/linLay1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:contentDescription="Icon"
-        tools:srcCompat="@mipmap/ic_launcher" />
+        android:orientation="vertical"
+        android:scaleType="fitCenter">
+
+        <ImageView
+            android:id="@+id/userimageadapter"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:contentDescription="Icon"
+            android:scaleType="fitCenter"
+            tools:srcCompat="@mipmap/ic_launcher" />
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/status"
+    android:layout_gravity="center">
+        <LinearLayout
+            android:id="@+id/linLayStatsonn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:layout_toEndOf="@id/userimageadapter"
+                android:layout_toRightOf="@id/userimageadapter"
+                android:src="@drawable/status_online" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:layout_marginLeft="5dp"
+                android:text="Online" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/linLayStatsOff"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:layout_toEndOf="@id/userimageadapter"
+                android:layout_toRightOf="@id/userimageadapter"
+                android:src="@drawable/status_offline" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:textStyle="bold"
+                android:text="Offline" />
+        </LinearLayout>
+    </LinearLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_toEndOf="@id/userimageadapter"
-        android:layout_toRightOf="@id/userimageadapter"
+        android:layout_toEndOf="@id/linLay1"
+        android:layout_toRightOf="@id/linLay1"
         android:gravity="center_vertical"
         android:orientation="vertical">
 
