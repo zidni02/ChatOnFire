@@ -56,6 +56,7 @@ public class MessageActivity extends AppCompatActivity {
     List<Chat> mChat;
     String userid, usernamerecever;
     ValueEventListener seenLitstner;
+    String senderName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,8 +68,8 @@ public class MessageActivity extends AppCompatActivity {
         getSupportActionBar().hide();
 
         //initate var;
-        statusImg=findViewById(R.id.status_img_activity_msg);
-        statusOnOff=findViewById(R.id.status_activity_msg);
+        statusImg = findViewById(R.id.status_img_activity_msg);
+        statusOnOff = findViewById(R.id.status_activity_msg);
         imageView = findViewById(R.id.imageProfile);
         username = findViewById(R.id.usernameyMsg);
         editTextMsgSend = findViewById(R.id.edittext_chatbox_send);
@@ -84,6 +85,39 @@ public class MessageActivity extends AppCompatActivity {
         intent = getIntent();
         userid = intent.getStringExtra("userid");
         usernamerecever = intent.getStringExtra("username");
+        FirebaseUser user2=FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference reference1 = FirebaseDatabase.getInstance().getReference("MyUsers").child(user2.getUid());
+
+        reference1.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Users users=snapshot.getValue(Users.class);
+                senderName=users.getUsername().toString();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+//Text Test From msg
+//        final TextView textSeenTest = findViewById(R.id.textTest);
+//        DatabaseReference textTestRef = FirebaseDatabase.getInstance().getReference("ChatList");
+//        textTestRef.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+//                    textSeenTest.setText(snapshot1.child("isseen").getValue().toString());
+//                }
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
 
 
         fireUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -94,10 +128,10 @@ public class MessageActivity extends AppCompatActivity {
                 Users users = snapshot.getValue(Users.class);
                 username.setText(users.getUsername());
                 statusOnOff.setText(users.getStatus());
-                if (users.getStatus().equals("Online")){
+                if (users.getStatus().equals("Online")) {
                     statusImg.setImageResource(R.drawable.status_online);
                 }
-                if (users.getStatus().equals("Offline")){
+                if (users.getStatus().equals("Offline")) {
                     statusImg.setImageResource(R.drawable.status_offline);
                 }
                 if (users.getImageURL().equals("default")) {
@@ -119,23 +153,24 @@ public class MessageActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String msg = editTextMsgSend.getText().toString();
                 if (!msg.equals("")) {
-                    sendmessage(fireUser.getUid(), userid, msg, usernamerecever);
+                    sendmessage(fireUser.getUid(), userid, msg, usernamerecever, senderName);
                     editTextMsgSend.setText("");
                 }
             }
         });
         seenMsgListen(userid);
     }
-    private void seenMsgListen(final String userid){
-        reference=FirebaseDatabase.getInstance().getReference("ChatList");
-        seenLitstner =reference.addValueEventListener(new ValueEventListener() {
+
+    private void seenMsgListen(final String userid) {
+        reference = FirebaseDatabase.getInstance().getReference("ChatList");
+        seenLitstner = reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot:dataSnapshot.getChildren()){
-                    Chat chat=snapshot.getValue(Chat.class);
-                    if (chat.getReceiver().equals(fireUser.getUid()) && chat.getSender().equals(userid)){
-                        HashMap<String, Object>hashMap=new HashMap<>();
-                        hashMap.put("isseen",true);
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Chat chat = snapshot.getValue(Chat.class);
+                    if (chat.getReceiver().equals(fireUser.getUid()) && chat.getSender().equals(userid)) {
+                        HashMap<String, Object> hashMap = new HashMap<>();
+                        hashMap.put("isseen", true);
                         snapshot.getRef().updateChildren(hashMap);
                     }
                 }
@@ -148,8 +183,9 @@ public class MessageActivity extends AppCompatActivity {
         });
     }
 
-    private void sendmessage(String sender, String receiver, String message, String usernamerecever) {
+    private void sendmessage(String sender, String receiver, String message, String usernamerecever, String senderName) {
         reference = FirebaseDatabase.getInstance().getReference();
+
         /*Pushing new data for msges*/
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("sender", sender);
@@ -157,6 +193,7 @@ public class MessageActivity extends AppCompatActivity {
         hashMap.put("receivername", usernamerecever);
         hashMap.put("message", message);
         hashMap.put("isseen", false);
+        hashMap.put("sendername", senderName);
         reference.child("ChatList").push().setValue(hashMap);
         /*For Recent Chats initials*/
         final DatabaseReference charRef2 = FirebaseDatabase.getInstance().getReference("ChatRecent").child(fireUser.getUid()).child(userid);
@@ -164,7 +201,9 @@ public class MessageActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
+                    Chat chat=snapshot.getValue(Chat.class);
                     charRef2.child("id").setValue(userid);
+                    charRef2.child("receiverid").setValue(chat.getReceiver());
                 }
             }
 
@@ -223,6 +262,23 @@ public class MessageActivity extends AppCompatActivity {
 
     private void readmsg(final String myid, final String userid, final String imagURL) {
         mChat = new ArrayList<>();
+//        final DatabaseReference myRef=FirebaseDatabase.getInstance().getReference("MyUsers").child(fireUser.getUid());
+//        myRef.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                boolean connected = snapshot.getValue(boolean.class);
+//                if (connected) {
+//                    DatabaseReference databaseReference=myRef.child("newValue");
+//                    databaseReference.setValue(true);
+//                    databaseReference.onDisconnect().setValue(Boolean.FALSE);
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
         reference = FirebaseDatabase.getInstance().getReference("ChatList");
         reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -284,21 +340,28 @@ public class MessageActivity extends AppCompatActivity {
         }
 
     }
+
     @Override
     protected void onResume() {
         super.onResume();
         checkStatus("Online");
+//        reference = FirebaseDatabase.getInstance()
+//                .getReference("MyUsers").child(fireUser.getUid()).child("newValue");
+//        reference.setValue("hello");
+//        reference.onDisconnect().setValue("False");
     }
 
     @Override
     protected void onUserLeaveHint() {
         super.onUserLeaveHint();
         checkStatus("Offline");
+
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        checkStatus("Offline");
         reference.removeEventListener(seenLitstner);
     }
 
@@ -315,6 +378,8 @@ public class MessageActivity extends AppCompatActivity {
         HashMap<String, Object> hashMap2 = new HashMap<>();
         hashMap2.put("status", status);
         reference.updateChildren(hashMap2);
+
+//        reference.child("status").onDisconnect().setValue("Offline");
 
     }
 

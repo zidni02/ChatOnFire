@@ -3,6 +3,7 @@ package com.zidni.chatonfire;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -25,7 +26,6 @@ public class LoginActivity extends AppCompatActivity {
     Button loginBtn, signupBtn;
     private static final String TAG = "LoginActivity";
     FirebaseAuth myAuth;
-    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +35,6 @@ public class LoginActivity extends AppCompatActivity {
         passLogin = findViewById(R.id.passEditTex);
         loginBtn = findViewById(R.id.login_btn);
         signupBtn = findViewById(R.id.signUpAct);
-        progressBar = findViewById(R.id.progressBar);
         signupBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -64,6 +63,7 @@ public class LoginActivity extends AppCompatActivity {
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
 
                 String email_tex = emaillogin.getText().toString();
                 String passTex = passLogin.getText().toString();
@@ -71,19 +71,21 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "Please fill up all the field", Toast.LENGTH_LONG).show();
 
                 } else {
+                    progressDialog.setMessage("Loging in");
+                    progressDialog.show();
                     myAuth.signInWithEmailAndPassword(email_tex, passTex).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
-                            progressBar.setVisibility(View.VISIBLE);
                             if (task.isSuccessful()) {
                                 startActivity(new Intent(LoginActivity.this, MainActivity.class)
                                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
-                                progressBar.setVisibility(View.GONE);
+                                progressDialog.hide();
                                 finish();
+                                progressDialog.dismiss();
                             } else {
                                 Toast.makeText(LoginActivity.this, "Inavlid!",
                                         Toast.LENGTH_LONG).show();
-                                progressBar.setVisibility(View.GONE);
+                                progressDialog.dismiss();
                             }
                         }
 
@@ -99,7 +101,6 @@ public class LoginActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         myAuth.addAuthStateListener(mAuthListener);
-        progressBar.setVisibility(View.VISIBLE);
 
     }
 

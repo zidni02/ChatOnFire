@@ -3,6 +3,7 @@ package com.zidni.chatonfire;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -27,6 +28,7 @@ public class RegisterActivity extends AppCompatActivity {
     private Button loginBtn, signupBtn;
     private FirebaseAuth myAuth;
     DatabaseReference myRef;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +39,7 @@ public class RegisterActivity extends AppCompatActivity {
         emailEt = findViewById(R.id.emailEditTex);
         loginBtn = findViewById(R.id.login_btn);
         signupBtn = findViewById(R.id.signup_btn);
+        progressDialog = new ProgressDialog(RegisterActivity.this);
         myAuth = FirebaseAuth.getInstance();
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,6 +58,8 @@ public class RegisterActivity extends AppCompatActivity {
                 if (TextUtils.isEmpty(userTex) || TextUtils.isEmpty(emailTex) || TextUtils.isEmpty(passTex)) {
                     Toast.makeText(RegisterActivity.this, "Please fill up all the field", Toast.LENGTH_LONG).show();
                 } else {
+                    progressDialog.show();
+                    progressDialog.setMessage("Signing Up...");
                     RegisterNow(userTex, emailTex, passTex);
                 }
             }
@@ -86,6 +91,7 @@ public class RegisterActivity extends AppCompatActivity {
                                         startActivity(new Intent(RegisterActivity.this, MainActivity.class)
                                                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
                                         finish();
+                                        progressDialog.dismiss();
                                     }
                                 }
                             });
@@ -93,6 +99,7 @@ public class RegisterActivity extends AppCompatActivity {
                         } else {
                             Toast.makeText(RegisterActivity.this, "Inavlid!",
                                     Toast.LENGTH_LONG).show();
+                            progressDialog.dismiss();
                         }
                     }
                 });

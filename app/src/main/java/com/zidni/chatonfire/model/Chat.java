@@ -4,6 +4,7 @@ public class Chat {
     private String sender;
     private String receiver;
     private String message;
+    private boolean isseen;
     private String receivername;
 
     public String getSender() {
@@ -30,14 +31,6 @@ public class Chat {
         this.message = message;
     }
 
-    public String getReceivername() {
-        return receivername;
-    }
-
-    public void setReceivername(String receivername) {
-        this.receivername = receivername;
-    }
-
     public boolean isIsseen() {
         return isseen;
     }
@@ -46,16 +39,33 @@ public class Chat {
         this.isseen = isseen;
     }
 
+    public String getReceivername() {
+        return receivername;
+    }
+
+    public void setReceivername(String receivername) {
+        this.receivername = receivername;
+    }
+
+    public String getSendername() {
+        return sendername;
+    }
+
+    public void setSendername(String sendername) {
+        this.sendername = sendername;
+    }
+
     public Chat() {
     }
 
-    public Chat(String sender, String receiver, String message, String receivername, boolean isseen) {
+    public Chat(String sender, String receiver, String message, boolean isseen, String receivername, String sendername) {
         this.sender = sender;
         this.receiver = receiver;
         this.message = message;
-        this.receivername = receivername;
         this.isseen = isseen;
+        this.receivername = receivername;
+        this.sendername = sendername;
     }
 
-    private boolean isseen;
+    private String sendername;
 }

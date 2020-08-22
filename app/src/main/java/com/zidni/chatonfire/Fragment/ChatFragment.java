@@ -21,6 +21,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.zidni.chatonfire.ChatActivity;
 import com.zidni.chatonfire.R;
 import com.zidni.chatonfire.adapter.UserAdapter;
+import com.zidni.chatonfire.model.Chat;
 import com.zidni.chatonfire.model.ChatList;
 import com.zidni.chatonfire.model.Users;
 
@@ -33,7 +34,7 @@ public class ChatFragment extends Fragment {
     private List<Users> mUsers;
     FirebaseUser fuser;
     DatabaseReference reference;
-    private List<ChatList> usersList;
+    private List<String> usersList;
     RecyclerView recyclerView;
 
     public ChatFragment() {
@@ -59,14 +60,21 @@ public class ChatFragment extends Fragment {
 
         usersList = new ArrayList<>();
         fuser = FirebaseAuth.getInstance().getCurrentUser();
-        reference = FirebaseDatabase.getInstance().getReference("ChatRecent").child(fuser.getUid());
+//        reference = FirebaseDatabase.getInstance().getReference("ChatRecent").child(fuser.getUid());
+        reference = FirebaseDatabase.getInstance().getReference("ChatList");
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 usersList.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Chat chat = snapshot.getValue(Chat.class);
                     ChatList chatList = snapshot.getValue(ChatList.class);
-                    usersList.add(chatList);
+                    if (chat.getSender().equals(fuser.getUid())) {
+                        usersList.add(chat.getReceiver());
+                    }
+                    if (chat.getReceiver().equals(fuser.getUid())) {
+                        usersList.add(chat.getSender());
+                    }
                 }
                 chatRecent();
             }
@@ -88,9 +96,17 @@ public class ChatFragment extends Fragment {
                 mUsers.clear();
                 for (DataSnapshot snapshot : datasnapshot.getChildren()) {
                     Users users = snapshot.getValue(Users.class);
-                    for (ChatList chatList : usersList) {
-                        if (users.getId().equals(chatList.getId())) {
-                            mUsers.add(users);
+                    for (String id : usersList) {
+                        if (users.getId().equals(id)) {
+                            if (mUsers.size() != 0) {
+                                for (Users users1 : mUsers) {
+                                    if (!users.getId().equals(users1.getId())) {
+                                        mUsers.add(users);
+                                    }
+                                }
+                            } else {
+                                mUsers.add(users);
+                            }
                         }
                     }
                 }

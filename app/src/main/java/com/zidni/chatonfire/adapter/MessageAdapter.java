@@ -14,8 +14,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.zidni.chatonfire.MessageActivity;
 import com.zidni.chatonfire.R;
 import com.zidni.chatonfire.model.Chat;
@@ -63,18 +66,20 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 //            holder.userreceiver.setText(chat.getReceivername());
 
         holder.show_msg.setText(chat.getMessage());
+        holder.userreceiver.setText(chat.getSendername()+" :");
+
+
         if (imageURL.equals("default")) {
             holder.profile_img.setImageResource(R.mipmap.ic_launcher);
         } else {
             Glide.with(context).load(imageURL).into(holder.profile_img);
         }
-        if (position==mChat.size()-1){
-            if (chat.isIsseen()){
-                holder.isseen.setText("Seen");
+        if (position == mChat.size() - 1) {
+            if (chat.isIsseen()) {
+                holder.isseen.setImageResource(R.drawable.ic_baseline_done_outline_24);
                 holder.isseen.setVisibility(View.VISIBLE);
-            }
-            else {
-                holder.isseen.setText("Delivered");
+            } else {
+                holder.isseen.setImageResource(R.drawable.ic_baseline_done_24);
                 holder.isseen.setVisibility(View.VISIBLE);
             }
         }
@@ -95,14 +100,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         public TextView show_msg;
         public ImageView profile_img;
         public TextView userreceiver;
-        public TextView isseen;
+        public ImageView isseen;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             show_msg = itemView.findViewById(R.id.show_msg);
             profile_img = itemView.findViewById(R.id.profile_pic_conversation);
             userreceiver = itemView.findViewById(R.id.usernamereceiver);
-            isseen=itemView.findViewById(R.id.msg_status_seen_unseen);
+            isseen = itemView.findViewById(R.id.msg_status_seen_unseen);
 
 
         }

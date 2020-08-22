@@ -11,6 +11,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -46,18 +47,6 @@ public class MainActivity extends AppCompatActivity {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         myRef = FirebaseDatabase.getInstance().getReference("MyUsers")
                 .child(firebaseUser.getUid());
-        myRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Users users = snapshot.getValue(Users.class);
-                toastMessage("User Login: " + users.getUsername());
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
         TabLayout tabLayout = findViewById(R.id.tabLayout);
         ViewPager viewPager = findViewById(R.id.viewPager);
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
@@ -130,12 +119,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//        checkStatus("Online");
-//    }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -148,10 +131,6 @@ public class MainActivity extends AppCompatActivity {
 //        checkStatus("Offline");
 //    }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
 
     private void checkStatus(String status) {
         myRef = FirebaseDatabase.getInstance()
@@ -159,7 +138,6 @@ public class MainActivity extends AppCompatActivity {
         HashMap<String, Object> hashMap2 = new HashMap<>();
         hashMap2.put("status", status);
         myRef.updateChildren(hashMap2);
-
     }
 
     @Override
@@ -171,6 +149,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onUserLeaveHint() {
         super.onUserLeaveHint();
+        checkStatus("Offline");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
         checkStatus("Offline");
     }
 }
