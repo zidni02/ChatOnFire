@@ -15,14 +15,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -54,6 +57,7 @@ public class ProfileFragment extends Fragment {
     private Uri imageUri;
     private StorageTask uploadtask;
     private int RESULT;
+    ValueEventListener valueEventListener;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -67,20 +71,37 @@ public class ProfileFragment extends Fragment {
         imageView = view.findViewById(R.id.imageProfile2);
         textView = view.findViewById(R.id.usernamerProfile);
         textView.setAllCaps(true);
-
-        storageReference = FirebaseStorage.getInstance().getReference("uploads");
+        Button delBtn = view.findViewById(R.id.deletebtnProfile);
+        delBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                StorageReference fileDelete = FirebaseStorage.getInstance().getReference("Images").child(fuser.getUid()+".jpg");
+                fileDelete.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        toastmsg("Profile Image Deleted!!");
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        toastmsg("Invalid");
+                    }
+                });
+            }
+        });
 
         fuser = FirebaseAuth.getInstance().getCurrentUser();
+        storageReference = FirebaseStorage.getInstance().getReference("Images");
         reference = FirebaseDatabase.getInstance().getReference("MyUsers").child(fuser.getUid());
-        reference.addValueEventListener(new ValueEventListener() {
+        valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Users users = snapshot.getValue(Users.class);
                 textView.setText(users.getUsername());
-                if (users.getImageURL().equals("default")) {
-                    imageView.setImageResource(R.mipmap.ic_launcher);
-                } else {
-                    Glide.with(getContext()).load(users.getImageURL()).into(imageView);
+                if (!users.getImageURL().equals("default")) {
+//                    imageView.setImageResource(R.mipmap.ic_launcher);
+                    Glide.with(getActivity()).load(users.getImageURL()).diskCacheStrategy(DiskCacheStrategy.NONE) // <= ADDED
+                            .skipMemoryCache(true).into(imageView);
                 }
 
             }
@@ -89,7 +110,8 @@ public class ProfileFragment extends Fragment {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
+        };
+        reference.addValueEventListener(valueEventListener);
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -121,8 +143,8 @@ public class ProfileFragment extends Fragment {
 
         if (imageUri != null) {
             final StorageReference filereference = storageReference
-                    .child(System.currentTimeMillis() + "."
-                    + getFileExtension(imageUri));
+                    .child(fuser.getUid() + "."
+                            + getFileExtension(imageUri));
 
 
             uploadtask = filereference.putFile(imageUri);
@@ -174,15 +196,32 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == IMAGE_REQUEST && resultCode==RESULT_OK
+        if (requestCode == IMAGE_REQUEST && resultCode == RESULT_OK
                 && data != null && data.getData() != null) {
             imageUri = data.getData();
-            if (uploadtask!=null && uploadtask.isInProgress()){
+            if (uploadtask != null && uploadtask.isInProgress()) {
                 toastmsg("Upload in progress");
-            }
-            else {
+            } else {
                 UploadmyImage();
             }
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        reference.addValueEventListener(valueEventListener);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        reference.removeEventListener(valueEventListener);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        reference.removeEventListener(valueEventListener);
     }
 }

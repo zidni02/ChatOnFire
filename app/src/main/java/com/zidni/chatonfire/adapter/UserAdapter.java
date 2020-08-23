@@ -1,5 +1,6 @@
 package com.zidni.chatonfire.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.renderscript.Sampler;
@@ -36,6 +37,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     private List<Users> mEmail;
     private boolean isChat;
     private String theLastMsg;
+    private FirebaseAuth myAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
 
     public UserAdapter(Context context, List<Users> mUsers, boolean isChat) {
         this.context = context;
@@ -128,6 +131,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     }
 
     private void setTheLastMsg(final String userid, final TextView userLastMsg) {
+        myAuth = FirebaseAuth.getInstance();
         theLastMsg = "default";
         final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("ChatList");
@@ -139,6 +143,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                     if (chat.getReceiver().equals(firebaseUser.getUid()) && chat.getSender().equals(userid) || chat.getSender().equals(firebaseUser.getUid())
                             && chat.getReceiver().equals(userid)) {
                         theLastMsg = chat.getMessage();
+                        if (mAuthListener!=null){
+                            myAuth.removeAuthStateListener(mAuthListener);
+                        }
                     }
                 }
                 switch (theLastMsg) {
